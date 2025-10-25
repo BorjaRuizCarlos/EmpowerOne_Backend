@@ -66,3 +66,8 @@ CORS_ALLOW_CREDENTIALS = True
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+
+# Bank adapter configuration (Nessie-like defaults)
+BANK_API_KEY = os.getenv("BANK_API_KEY", "")
+BANK_API_BASE_CUSTOMER = os.getenv("BANK_API_BASE_CUSTOMER", "https://api.nessieisreal.com")
+BANK_API_BASE_ENTERPRISE = os.getenv("BANK_API_BASE_ENTERPRISE", "https://api.nessieisreal.com/enterprise")

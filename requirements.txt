@@ -10,3 +10,4 @@ drf-spectacular
 cryptography
 python-dotenv
 django-cors-headers
+requests
