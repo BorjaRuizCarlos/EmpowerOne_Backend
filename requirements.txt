@@ -1,13 +1,30 @@
+# Django framework
 Django>=4.2
+
+# REST API
 djangorestframework
 djangorestframework-simplejwt
-psycopg2-binary
-dj-database-url
-django-environ
+
+# Database
+psycopg2-binary       # PostgreSQL driver
+dj-database-url        # Parse DATABASE_URL
+django-environ         # Environment variables
+
+# Async tasks
 celery
 redis
+
+# API documentation
 drf-spectacular
+
+# Security / password hashing
 cryptography
+
+# Environment variables
 python-dotenv
+
+# Cross-Origin Resource Sharing
 django-cors-headers
+
+# HTTP requests
 requests
