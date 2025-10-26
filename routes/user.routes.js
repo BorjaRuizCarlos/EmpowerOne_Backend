@@ -826,4 +826,189 @@ router.post("/balances", auth, userController.createUserBalance);
  */
 router.delete("/balances/:id", auth, userController.deleteUserBalance);
 
+/**
+ * @swagger
+ * /api/user/metrics/balance-trend/{months}:
+ *   get:
+ *     summary: Get user balance trend over time
+ *     description: Returns the user’s balance trend for the past N months, calculated from their transactions (income minus expenses).
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: months
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 6
+ *         description: Number of months to include in the balance trend (e.g., 6 = last 6 months)
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved balance trend
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: string
+ *                     example: "Oct"
+ *                   balance:
+ *                     type: number
+ *                     format: float
+ *                     example: 1245.67
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to fetch balance trend
+ */
+router.get("/metrics/balance-trend/:months", auth, userController.getUserBalanceTrend);
+
+/**
+ * @swagger
+ * /api/user/metrics/cash-flow/{week_start}:
+ *   get:
+ *     summary: Get user cash flow for a given week
+ *     description: Retrieves the user’s daily income and expenses for the week starting from a given date.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: week_start
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: "2025-10-20"
+ *         description: The start date (Monday) of the week to analyze.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved weekly cash flow
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   day:
+ *                     type: string
+ *                     example: "Mon"
+ *                   income:
+ *                     type: number
+ *                     format: float
+ *                     example: 200.50
+ *                   expenses:
+ *                     type: number
+ *                     format: float
+ *                     example: 150.00
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to fetch cash flow
+ */
+router.get("/metrics/cash-flow/:week_start", auth, userController.getUserCashFlow);
+
+/**
+ * @swagger
+ * /api/user/metrics/summary:
+ *   get:
+ *     summary: Get overall user financial summary
+ *     description: Returns current balance, this month’s income and expenses, and upcoming unpaid bills summary.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user summary
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 currentbalance:
+ *                   type: number
+ *                   format: float
+ *                   example: 2540.75
+ *                 monthlyincome:
+ *                   type: number
+ *                   format: float
+ *                   example: 3000.00
+ *                 monthlyexpenses:
+ *                   type: number
+ *                   format: float
+ *                   example: 1200.50
+ *                 upcomingbillstotal:
+ *                   type: number
+ *                   format: float
+ *                   example: 800.00
+ *                 upcomingbillscount:
+ *                   type: integer
+ *                   example: 3
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to fetch user summary
+ */
+router.get("/metrics/summary", auth, userController.getUserSummary);
+
+/**
+ * @swagger
+ * /api/user/bills/upcoming/{days_ahead}:
+ *   get:
+ *     summary: Get upcoming unpaid bills
+ *     description: Fetches all unpaid bills due within the next specified number of days.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: days_ahead
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 30
+ *         description: Number of days ahead to look for upcoming bills
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved upcoming bills
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 45
+ *                   name:
+ *                     type: string
+ *                     example: "Electricity Bill"
+ *                   amount:
+ *                     type: number
+ *                     format: float
+ *                     example: 120.50
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                     example: "2025-11-10"
+ *                   category:
+ *                     type: string
+ *                     example: "Utilities"
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Failed to fetch upcoming bills
+ */
+router.get("/bills/upcoming/:days_ahead", auth, userController.getUserUpcomingBills);
+
 module.exports = router;

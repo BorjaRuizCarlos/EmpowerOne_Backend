@@ -404,6 +404,73 @@ const userController = {
             res.status(500).json({ error: "Failed to delete balance" });
         }
     },
+
+    // Get user balance trend
+    getUserBalanceTrend: async (req, res) => {
+        try {
+            console.log("GET USER BALANCE TREND");
+
+            const user_id = req.user.id;
+
+            const { months } = req.params;
+
+            const trend = await userModel.getUserBalanceTrend(user_id, parseInt(months));
+            res.json(trend);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch balance trend" });
+        }
+    },
+
+    // Get user cash flow
+    getUserCashFlow: async (req, res) => {
+        try {
+            console.log("GET USER CASH FLOW");
+
+            const user_id = req.user.id;
+
+            const { week_start } = req.params;
+
+            const cashFlow = await userModel.getUserCashFlow(user_id, week_start);
+            res.json(cashFlow);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch cash flow" });
+        }
+    },
+
+    // Get user summary
+    getUserSummary: async (req, res) => {
+        try {
+            console.log("GET USER SUMMARY");
+
+            const user_id = req.user.id;
+
+            const summary = await userModel.getUserSummary(user_id);
+            res.json(summary);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch user summary" });
+        }
+    },
+
+    // Get user upcoming bills
+    getUserUpcomingBills: async (req, res) => {
+        try {
+            console.log("GET USER UPCOMING BILLS");
+
+            const user_id = req.user.id;
+
+            const { days_ahead } = req.params;
+            const bills = await userModel.getUserUpcomingBills(user_id, parseInt(days_ahead));
+            res.json(bills);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch upcoming bills" });
+        }
+    },
 };
 
 module.exports = userController;
