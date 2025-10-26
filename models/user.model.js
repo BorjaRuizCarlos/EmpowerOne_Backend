@@ -1,3 +1,4 @@
+const { use } = require('react');
 const pool = require('../config/db');
 
 const userModel = {
@@ -199,7 +200,107 @@ const userModel = {
         const result = await pool.query(`DELETE FROM goals WHERE id = $1`, [goal_id]);
 
         return result.rows[0];
-    }
+    },
+    getUserTransactions: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserTransaction: async (transaction_id) => {
+        const result = await pool.query(
+            `SELECT * FROM transactions WHERE id = $1`,
+            [transaction_id]
+        );
+        return result.rows[0];
+    },
+    createUserTransaction: async ({ user_id, goal_id = null, type, category, amount, occurred_at, description }) => {
+        const result = await pool.query(
+            `INSERT INTO transactions (user_id, goal_id, type, category, amount, occurred_at, description)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [user_id, goal_id, type, category, amount, occurred_at, description]
+        );
+        return result.rows[0];
+    },
+    updateUserTransaction: async (transaction_id, fields) => {
+        const keys = Object.keys(fields);
+        const values = Object.values(fields);
+        if (!keys.length) return null;
+
+        const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
+        const query = `UPDATE transactions SET ${setClause} WHERE id = $${keys.length + 1} RETURNING *`;
+        const result = await pool.query(query, [...values, transaction_id]);
+        return result.rows[0];
+    },
+    deleteUserTransaction: async (transaction_id) => {
+        const result = await pool.query(`DELETE FROM transactions WHERE id = $1 RETURNING *`, [transaction_id]);
+        return result.rows[0];
+    },
+    getUserBills: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM bills WHERE user_id = $1 ORDER BY due_date ASC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserBill: async (bill_id) => {
+        const result = await pool.query(`SELECT * FROM bills WHERE id = $1`, [bill_id]);
+        return result.rows[0];
+    },
+    createUserBill: async ({ user_id, name, amount, category, due_date, is_recurring, recurrence_interval }) => {
+        const result = await pool.query(
+            `INSERT INTO bills (user_id, name, amount, category, due_date, is_recurring, recurrence_interval)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [user_id, name, amount, category, due_date, is_recurring, recurrence_interval]
+        );
+        return result.rows[0];
+    },
+    updateUserBill: async (bill_id, fields) => {
+        const keys = Object.keys(fields);
+        const values = Object.values(fields);
+        if (!keys.length) return null;
+
+        const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
+        const query = `UPDATE bills SET ${setClause} WHERE id = $${keys.length + 1} RETURNING *`;
+        const result = await pool.query(query, [...values, bill_id]);
+        return result.rows[0];
+    },
+    deleteUserBill: async (bill_id) => {
+        await pool.query(`DELETE FROM bills WHERE id = $1`, [bill_id]);
+        return { message: "Bill deleted successfully" };
+    },
+    getUserBalances: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM balances WHERE user_id = $1 ORDER BY year DESC, month DESC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserBalance: async (user_id, year, month) => {
+        const result = await pool.query(
+            `SELECT * FROM balances WHERE user_id = $1 AND year = $2 AND month = $3`,
+            [user_id, year, month]
+        );
+        return result.rows[0];
+    },
+    createUserBalance: async ({ user_id, year, month, balance }) => {
+        const result = await pool.query(
+            `INSERT INTO balances (user_id, year, month, balance)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, year, month)
+            DO UPDATE SET balance = EXCLUDED.balance
+            RETURNING *`,
+            [user_id, year, month, balance]
+        );
+        return result.rows[0];
+    },
+    deleteUserBalance: async (user_id, year, month) => {
+        await pool.query(`DELETE FROM balances WHERE user_id = $1 AND year = $2 AND month = $3`, [user_id, year, month]);
+        return { message: "Balance entry deleted successfully" };
+    },
 };
 
 module.exports = userModel;
