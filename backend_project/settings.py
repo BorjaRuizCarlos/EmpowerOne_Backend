@@ -81,3 +81,5 @@ CELERY_RESULT_BACKEND = REDIS_URL
 BANK_API_KEY = os.getenv("BANK_API_KEY", "")
 BANK_API_BASE_CUSTOMER = os.getenv("BANK_API_BASE_CUSTOMER", "https://api.nessieisreal.com")
 BANK_API_BASE_ENTERPRISE = os.getenv("BANK_API_BASE_ENTERPRISE", "https://api.nessieisreal.com/enterprise")
+
+AUTH_USER_MODEL = 'api.User'
