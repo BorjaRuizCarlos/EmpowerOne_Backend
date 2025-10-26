@@ -27,7 +27,7 @@ const bankController = {
     },
     getAccountDetailsCustomer: async (req, res) => {
         try {
-            onsole.log("ACCOUNT DETAILS - CUSTOMER")
+            console.log("ACCOUNT DETAILS - CUSTOMER")
 
             const { accountId } = req.params;
             const account = await bankService.getAccountDetails(accountId);
@@ -38,7 +38,7 @@ const bankController = {
     },
     getAccountDetailsEnterprise: async (req, res) => {
         try {
-            onsole.log("ACCOUNT DETAILS - ENTERPRISE")
+            console.log("ACCOUNT DETAILS - ENTERPRISE")
 
             const { accountId } = req.params;
             const account = await bankService.getAccountDetails(accountId, enterprise=true);
