@@ -5,17 +5,10 @@ const auth = require('../middleware/auth');
 
 /**
  * @swagger
- * tags:
- *   name: Users
- *   description: User management
- */
-
-/**
- * @swagger
- * /users/register:
+ * /api/user/register:
  *   post:
  *     summary: Register a new user
- *     tags: [Users]
+ *     tags: [User]
  *     requestBody:
  *       required: true
  *       content:
@@ -43,10 +36,10 @@ router.post('/register', userController.register);
 
 /**
  * @swagger
- * /users/login:
+ * /api/user/login:
  *   post:
  *     summary: Login a user
- *     tags: [Users]
+ *     tags: [User]
  *     requestBody:
  *       required: true
  *       content:
@@ -71,10 +64,10 @@ router.post('/login', userController.login);
 
 /**
  * @swagger
- * /users/profile:
+ * /api/user/profile:
  *   get:
  *     summary: Get current user profile
- *     tags: [Users]
+ *     tags: [User]
  *     security:
  *       - bearerAuth: []
  *     responses:

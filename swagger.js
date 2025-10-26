@@ -10,7 +10,7 @@ const options = {
             description: 'A simple API for users with authentication',
         },
         servers: [
-            { url: 'http://localhost:3000', description: 'Local server' }
+            { url: 'http://localhost:8000', description: 'Local server' }
         ],
         components: {
             securitySchemes: {
@@ -20,8 +20,7 @@ const options = {
                     bearerFormat: 'JWT'
                 }
             }
-        },
-        security: [{ bearerAuth: [] }],
+        }
     },
     apis: ['./routes/*.js'], // files containing annotations
 };
@@ -29,7 +28,18 @@ const options = {
 const specs = swaggerJsdoc(options);
 
 const setupSwagger = (app) => {
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    app.use(
+        '/api-docs',
+        swaggerUi.serve,
+        swaggerUi.setup(
+            specs,
+            {
+                swaggerOptions: {
+                    tryItOutEnabled: true
+                }
+            }
+        )
+    );
 };
 
 module.exports = setupSwagger;

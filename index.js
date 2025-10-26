@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const router = require('./routes/index.js');
-const setupSwagger = require('./swagger');
+const router = require('./routes/index.router.js');
+const setupSwagger = require('./swagger.js');
 
 const app = express();
-
 
 const corsOptions = {
   origin: ['http://localhost:8000'], // Add your frontend URLs

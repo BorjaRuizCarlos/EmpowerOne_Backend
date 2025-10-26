@@ -4,20 +4,13 @@ const bankController = require('../controllers/bank.controller');
 
 /**
  * @swagger
- * tags:
- *   name: Bank
- *   description: Endpoints for interacting with bank accounts and transactions
- */
-
-/**
- * @swagger
- * /api/bank/customers/accounts:
+ * /api/bank/enterprise/accounts:
  *   get:
- *     summary: Get all accounts for a customer
+ *     summary: Get all accounts
  *     tags: [Bank]
  *     responses:
  *       200:
- *         description: List of customer accounts
+ *         description: List of accounts
  *         content:
  *           application/json:
  *             schema:
@@ -30,11 +23,11 @@ const bankController = require('../controllers/bank.controller');
  *       500:
  *         description: Failed to fetch accounts
  */
-router.get('/customers/accounts', bankController.getAccounts);
+router.get('/accounts', bankController.getAccountsEnterprise);
 
 /**
  * @swagger
- * /api/bank/accounts/{accountId}:
+ * /api/bank/enterprise/accounts/{accountId}:
  *   get:
  *     summary: Get details of a specific account
  *     tags: [Bank]
@@ -60,13 +53,13 @@ router.get('/customers/accounts', bankController.getAccounts);
  *       500:
  *         description: Failed to fetch account details
  */
-router.get('/accounts/:accountId', bankController.getAccountDetails);
+router.get('/accounts/:accountId', bankController.getAccountDetailsEnterprise);
 
 /**
  * @swagger
- * /api/bank/accounts/bills:
+ * /api/bank/enterprise/bills:
  *   get:
- *     summary: Get bills/transactions for an account
+ *     summary: Get bills/transactions
  *     tags: [Bank]
  *     responses:
  *       200:
@@ -83,6 +76,6 @@ router.get('/accounts/:accountId', bankController.getAccountDetails);
  *       500:
  *         description: Failed to fetch transactions
  */
-router.get('/accounts/bills', bankController.getBills);
+router.get('/bills', bankController.getBillsEnterprise);
 
 module.exports = router;

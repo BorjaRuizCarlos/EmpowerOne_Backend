@@ -1,42 +1,50 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const NESSIE_KEY = process.env.NESSIE_API_KEY;
-const BASE_URL = process.env.NESSIE_BASE_URL;
+const CAPITAL_ONE_API_KEY = process.env.CAPITAL_ONE_API_KEY;
+const CAPITAL_ONE_BASE_URL = process.env.CAPITAL_ONE_BASE_URL;
 
 const bankService = {
-    getAccounts: async () => {
+    getAccounts: async (params = null, enterprise = false) => {
         try {
-            const response = await axios.get(`${BASE_URL}/enterprise/accounts`, {
-                params: { key: NESSIE_KEY }
+            path = enterprise ? '/enterprise/accounts' : '/accounts';
+
+            const queryParams = { key: CAPITAL_ONE_API_KEY, ...(params || {}) };
+
+            const response = await axios.get(`${CAPITAL_ONE_BASE_URL + path}`, {
+                params: queryParams
             });
             return response.data;
         } catch (err) {
-            console.error('Nessie API error:', err.response?.data || err.message);
+            console.error('Capital One API error:', err.response?.data || err.message);
             throw err;
         }
     },
 
-    getAccountDetails: async (accountId) => {
+    getAccountDetails: async (accountId, enterprise = false) => {
         try {
-            const response = await axios.get(`${BASE_URL}/enterprise/accounts/${accountId}`, {
-                params: { key: NESSIE_KEY }
+            path = enterprise ? '/enterprise/accounts' : '/accounts';
+
+            const response = await axios.get(`${CAPITAL_ONE_BASE_URL + path}/${accountId}`, {
+                params: { key: CAPITAL_ONE_API_KEY }
             });
             return response.data;
         } catch (err) {
-            console.error('Nessie API error:', err.response?.data || err.message);
+            console.error('Capital One API error:', err.response?.data || err.message);
             throw err;
         }
     },
 
-    getBills: async () => {
+    getBills: async (enterprise = false) => {
         try {
-            const response = await axios.get(`${BASE_URL}/enterprise/bills`, {
-                params: { key: NESSIE_KEY }
+            path = enterprise ? '/enterprise/bills' : '/bills';
+
+            const response = await axios.get(`${CAPITAL_ONE_BASE_URL + path}`, {
+                params: { key: CAPITAL_ONE_API_KEY }
             });
             return response.data;
         } catch (err) {
-            console.error('Nessie API error:', err.response?.data || err.message);
+            console.error('Capital One API error:', err.response?.data || err.message);
             throw err;
         }
     }

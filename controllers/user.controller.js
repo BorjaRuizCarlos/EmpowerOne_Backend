@@ -54,7 +54,7 @@ const userController = {
             // Generate JWT
             const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
 
-            res.json({ token });
+            res.json({ token: token });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database error' });
