@@ -199,7 +199,212 @@ const userModel = {
         const result = await pool.query(`DELETE FROM goals WHERE id = $1`, [goal_id]);
 
         return result.rows[0];
-    }
+    },
+    getUserTransactions: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserTransaction: async (transaction_id) => {
+        const result = await pool.query(
+            `SELECT * FROM transactions WHERE id = $1`,
+            [transaction_id]
+        );
+        return result.rows[0];
+    },
+    createUserTransaction: async ({ user_id, goal_id = null, type, category, amount, occurred_at, description }) => {
+        const result = await pool.query(
+            `INSERT INTO transactions (user_id, goal_id, type, category, amount, occurred_at, description)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [user_id, goal_id, type, category, amount, occurred_at, description]
+        );
+        return result.rows[0];
+    },
+    updateUserTransaction: async (transaction_id, fields) => {
+        const keys = Object.keys(fields);
+        const values = Object.values(fields);
+        if (!keys.length) return null;
+
+        const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
+        const query = `UPDATE transactions SET ${setClause} WHERE id = $${keys.length + 1} RETURNING *`;
+        const result = await pool.query(query, [...values, transaction_id]);
+        return result.rows[0];
+    },
+    deleteUserTransaction: async (transaction_id) => {
+        const result = await pool.query(`DELETE FROM transactions WHERE id = $1 RETURNING *`, [transaction_id]);
+        return result.rows[0];
+    },
+    getUserBills: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM bills WHERE user_id = $1 ORDER BY due_date ASC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserBill: async (bill_id) => {
+        const result = await pool.query(`SELECT * FROM bills WHERE id = $1`, [bill_id]);
+        return result.rows[0];
+    },
+    createUserBill: async ({ user_id, name, amount, category, due_date, is_recurring, recurrence_interval }) => {
+        const result = await pool.query(
+            `INSERT INTO bills (user_id, name, amount, category, due_date, is_recurring, recurrence_interval)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *`,
+            [user_id, name, amount, category, due_date, is_recurring, recurrence_interval]
+        );
+        return result.rows[0];
+    },
+    updateUserBill: async (bill_id, fields) => {
+        const keys = Object.keys(fields);
+        const values = Object.values(fields);
+        if (!keys.length) return null;
+
+        const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
+        const query = `UPDATE bills SET ${setClause} WHERE id = $${keys.length + 1} RETURNING *`;
+        const result = await pool.query(query, [...values, bill_id]);
+        return result.rows[0];
+    },
+    deleteUserBill: async (bill_id) => {
+        await pool.query(`DELETE FROM bills WHERE id = $1`, [bill_id]);
+        return { message: "Bill deleted successfully" };
+    },
+    getUserBalances: async (user_id) => {
+        const result = await pool.query(
+            `SELECT * FROM balances WHERE user_id = $1 ORDER BY year DESC, month DESC`,
+            [user_id]
+        );
+        return result.rows;
+    },
+    getUserBalance: async (user_id, year, month) => {
+        const result = await pool.query(
+            `SELECT * FROM balances WHERE user_id = $1 AND year = $2 AND month = $3`,
+            [user_id, year, month]
+        );
+        return result.rows[0];
+    },
+    createUserBalance: async ({ user_id, year, month, balance }) => {
+        const result = await pool.query(
+            `INSERT INTO balances (user_id, year, month, balance)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, year, month)
+            DO UPDATE SET balance = EXCLUDED.balance
+            RETURNING *`,
+            [user_id, year, month, balance]
+        );
+        return result.rows[0];
+    },
+    deleteUserBalance: async (user_id, year, month) => {
+        await pool.query(`DELETE FROM balances WHERE user_id = $1 AND year = $2 AND month = $3`, [user_id, year, month]);
+        return { message: "Balance entry deleted successfully" };
+    },
+    getUserBalanceTrend: async (user_id, months) => {
+        const result = await pool.query(
+            `WITH monthly AS (
+            SELECT
+            user_id,
+            date_trunc('month', occurred_at) AS month_start,
+            SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END) AS total_income,
+            SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END) AS total_expense
+            FROM transactions
+            WHERE user_id = $1
+            GROUP BY user_id, month_start
+            ), months AS (
+            SELECT generate_series(date_trunc('month', current_date)- ( ($2::int- 1)
+            * INTERVAL '1 month'),
+            date_trunc('month', current_date),
+            '1 month') AS month_start
+            )
+            SELECT
+            to_char(m.month_start, 'Mon') AS month,
+            COALESCE(
+            (
+            3
+            SELECT SUM(total_income- total_expense)
+            FROM monthly m2
+            WHERE m2.month_start <= m.month_start
+            ), 0
+            ) AS balance
+            FROM months m
+            ORDER BY m.month_start;`
+            , [user_id, months]);
+
+        return result.rows;
+    },
+    getUserCashFlow: async (user_id, week_start) => {
+        const result = await pool.query(
+            `SELECT
+            to_char(day::date, 'Dy') AS day,
+            COALESCE(SUM(CASE WHEN type = 'income' THEN amount END), 0) AS income,
+            COALESCE(SUM(CASE WHEN type = 'expense' THEN amount END), 0) AS expenses
+            FROM (
+            SELECT generate_series($2::date, $2::date + INTERVAL '6 days', INTERVAL '1 
+            day') AS day
+            ) d
+            LEFT JOIN transactions t
+            ON t.user_id = $1
+            AND t.occurred_at::date = d.day::date
+            GROUP BY d.day
+            ORDER BY d.day;`,
+            [user_id, week_start]
+        )
+
+        return result.rows;
+    },
+    getUserSummary: async (user_id) => {
+        const result = await pool.query(
+            ` WITH month_bounds AS (
+            SELECT date_trunc('month', current_date) AS start_month,
+            (date_trunc('month', current_date) + INTERVAL '1 month')::date AS
+            next_month
+            )
+            SELECT
+            (SELECT COALESCE(SUM(CASE WHEN type = 'income' THEN amount WHEN type =
+            'expense' THEN-amount END),0)
+            FROM transactions
+            WHERE user_id = $1
+            ) AS currentBalance,
+            (SELECT COALESCE(SUM(amount),0)
+            FROM transactions, month_bounds
+            WHERE user_id = $1
+            AND type = 'income'
+            AND occurred_at >= month_bounds.start_month
+            AND occurred_at < month_bounds.next_month
+            ) AS monthlyIncome,
+            (SELECT COALESCE(SUM(amount),0)
+            FROM transactions, month_bounds
+            WHERE user_id = $1
+            AND type = 'expense'
+            AND occurred_at >= month_bounds.start_month
+            AND occurred_at < month_bounds.next_month
+            ) AS monthlyExpenses,
+            (SELECT COALESCE(SUM(amount),0) FROM bills WHERE user_id = $1 AND is_paid
+            = false AND due_date >= current_date AND due_date < current_date + INTERVAL
+            '30 days') AS upcomingBillsTotal,
+            (SELECT COUNT(*) FROM bills WHERE user_id = $1 AND is_paid = false AND
+            due_date >= current_date AND due_date < current_date + INTERVAL '30 days')
+            AS upcomingBillsCount;`,
+            [user_id]
+        )
+
+        return result.rows;
+    },
+    getUserUpcomingBills: async (user_id, days_ahead = "30") => {
+        const result = await pool.query(
+            `SELECT id, name, amount, due_date AS date, category
+            FROM bills
+            WHERE user_id = $1
+            AND is_paid = false
+            AND due_date >= current_date
+            AND due_date < current_date + ($2::int || ' days')::interval
+            ORDER BY due_date;`,
+            [user_id, days_ahead]
+        )
+
+        return result.rows;
+    },
 };
 
 module.exports = userModel;

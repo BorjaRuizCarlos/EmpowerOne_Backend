@@ -200,6 +200,277 @@ const userController = {
             res.status(500).json({ error: 'Database error' });
         }
     },
+
+    // Get user transactions
+    getUserTransactions: async (req, res) => {
+        try {
+            console.log("GET USER TRANSACTIONS");
+
+            const user_id = req.user.id;
+
+            const transactions = await userModel.getUserTransactions(user_id);
+            res.json(transactions);
+        } catch (err) {
+            console.error("Error fetching transactions:", err);
+            res.status(500).json({ error: "Failed to fetch transactions" });
+        }
+    },
+
+    // Get specific transaction
+    getUserTransaction: async (req, res) => {
+        try {
+            console.log("GET USER TRANSACTION");
+
+            const { transaction_id } = req.params;
+            const transaction = await userModel.getUserTransaction(transaction_id);
+            if (!transaction) return res.status(404).json({ error: "Transaction not found" });
+            res.json(transaction);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch transaction" });
+        }
+    },
+
+    // Create a new transaction
+    createUserTransaction: async (req, res) => {
+        try {
+            console.log("CREATE USER TRANSACTION");
+
+            const user_id = req.user.id;
+            const transaction = await userModel.createUserTransaction({ user_id, ...req.body });
+            res.status(201).json(transaction);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to create transaction" });
+        }
+    },
+
+    // Update existing transaction
+    updateUserTransaction: async (req, res) => {
+        try {
+            console.log("UPDATE USER TRANSACTION");
+
+            const { transaction_id } = req.params;
+            const updated = await userModel.updateUserTransaction(transaction_id, req.body);
+            if (!updated) return res.status(404).json({ error: "Transaction not found or not updated" });
+            res.json(updated);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to update transaction" });
+        }
+    },
+
+    // Delete a transaction
+    deleteUserTransaction: async (req, res) => {
+        try {
+            console.log("DELETE USER TRANSACTION");
+
+            const { transaction_id } = req.params;
+            const result = await userModel.deleteUserTransaction(transaction_id);
+            res.json(result);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to delete transaction" });
+        }
+    },
+
+    // Get user bills
+    getUserBills: async (req, res) => {
+        try {
+            console.log("GET USER BILLS");
+
+            const user_id = req.user.id;
+            const bills = await userModel.getUserBills(user_id);
+            res.json(bills);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch bills" });
+        }
+    },
+
+    // Get specific bill
+    getUserBill: async (req, res) => {
+        try {
+            console.log("GET USER BILL");
+
+            const { bill_id } = req.params;
+            const bill = await userModel.getUserBill(bill_id);
+            if (!bill) return res.status(404).json({ error: "Bill not found" });
+            res.json(bill);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch bill" });
+        }
+    },
+
+    // Create a new bill
+    createUserBill: async (req, res) => {
+        try {
+            console.log("CREATE USER BILL");
+
+            const user_id = req.user.id;
+            const bill = await userModel.createUserBill({ user_id, ...req.body });
+            res.status(201).json(bill);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to create bill" });
+        }
+    },
+
+    // Update existing bill
+    updateUserBill: async (req, res) => {
+        try {
+            console.log("UPDATE USER BILL");
+
+            const { bill_id } = req.params;
+            const updated = await userModel.updateUserBill(bill_id, req.body);
+            if (!updated) return res.status(404).json({ error: "Bill not found or not updated" });
+            res.json(updated);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to update bill" });
+        }
+    },
+
+    // Delete a bill
+    deleteUserBill: async (req, res) => {
+        try {
+            console.log("DELETE USER BILL");
+
+            const { bill_id } = req.params;
+            const result = await userModel.deleteUserBill(bill_id);
+            res.json(result);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to delete bill" });
+        }
+    },
+
+    // Get user balances
+    getUserBalances: async (req, res) => {
+        try {
+            console.log("GET USER BALANCES");
+
+            const user_id = req.user.id;
+            const balances = await userModel.getUserBalances(user_id);
+            res.json(balances);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch balances" });
+        }
+    },
+
+    // Get specific balance
+    getUserBalance: async (req, res) => {
+        try {
+            console.log("GET USER BALANCE");
+
+            const user_id = req.user.id;
+            const { year, month } = req.params;
+            const balance = await userModel.getUserBalance(user_id, year, month);
+            if (!balance) return res.status(404).json({ error: "Balance not found" });
+            res.json(balance);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch balance" });
+        }
+    },
+
+    // Create or update user balance
+    createUserBalance: async (req, res) => {
+        try {
+            console.log("CREATE USER BALANCE");
+
+            const user_id = req.user.id;
+            const balance = await userModel.createUserBalance({ user_id, ...req.body });
+            res.status(201).json(balance);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to create or update balance" });
+        }
+    },
+
+    // Delete a balance
+    deleteUserBalance: async (req, res) => {
+        try {
+            console.log("DELETE USER BALANCE");
+
+            const user_id = req.user.id;
+            const { year, month } = req.params;
+            const result = await userModel.deleteUserBalance(user_id, year, month);
+            res.json(result);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to delete balance" });
+        }
+    },
+
+    // Get user balance trend
+    getUserBalanceTrend: async (req, res) => {
+        try {
+            console.log("GET USER BALANCE TREND");
+
+            const user_id = req.user.id;
+
+            const { months } = req.params;
+
+            const trend = await userModel.getUserBalanceTrend(user_id, parseInt(months));
+            res.json(trend);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch balance trend" });
+        }
+    },
+
+    // Get user cash flow
+    getUserCashFlow: async (req, res) => {
+        try {
+            console.log("GET USER CASH FLOW");
+
+            const user_id = req.user.id;
+
+            const { week_start } = req.params;
+
+            const cashFlow = await userModel.getUserCashFlow(user_id, week_start);
+            res.json(cashFlow);
+
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch cash flow" });
+        }
+    },
+
+    // Get user summary
+    getUserSummary: async (req, res) => {
+        try {
+            console.log("GET USER SUMMARY");
+
+            const user_id = req.user.id;
+
+            const summary = await userModel.getUserSummary(user_id);
+            res.json(summary);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch user summary" });
+        }
+    },
+
+    // Get user upcoming bills
+    getUserUpcomingBills: async (req, res) => {
+        try {
+            console.log("GET USER UPCOMING BILLS");
+
+            const user_id = req.user.id;
+
+            const { days_ahead } = req.params;
+            const bills = await userModel.getUserUpcomingBills(user_id, parseInt(days_ahead));
+            res.json(bills);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "Failed to fetch upcoming bills" });
+        }
+    },
 };
 
 module.exports = userController;
