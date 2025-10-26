@@ -8,8 +8,8 @@ const app = express();
 
 const corsOptions = {
   origin: 
-  // ['http://my-node-env.eba-7tri2szs.us-east-1.elasticbeanstalk.com'], // Add your frontend URLs
-  ['http://localhost:5000'],
+  ['http://my-node-env.eba-7tri2szs.us-east-1.elasticbeanstalk.com'], // Add your frontend URLs
+  // ['http://localhost:5000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
