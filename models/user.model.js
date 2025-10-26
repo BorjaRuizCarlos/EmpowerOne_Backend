@@ -1,4 +1,3 @@
-const { use } = require('react');
 const pool = require('../config/db');
 
 const userModel = {
