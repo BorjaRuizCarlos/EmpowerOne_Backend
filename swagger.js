@@ -5,12 +5,14 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'User API',
+            title: 'EmpowerOne API',
             version: '1.0.0',
-            description: 'A simple API for users with authentication',
+            description: 'API documentation for the EmpowerOne backend services',
         },
         servers: [
-            { url: 'http://localhost:8000', description: 'Local server' }
+            { 
+                url: 'http://localhost:8000', description: 'Local server' 
+            }
         ],
         components: {
             securitySchemes: {
@@ -34,6 +36,8 @@ const setupSwagger = (app) => {
         swaggerUi.setup(
             specs,
             {
+                customCss: '.topbar {display: none}',
+                customSiteTitle: 'EmpowerOne API Docs',
                 swaggerOptions: {
                     tryItOutEnabled: true
                 }
