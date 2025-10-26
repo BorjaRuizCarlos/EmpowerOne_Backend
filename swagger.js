@@ -11,7 +11,7 @@ const options = {
         },
         servers: [
             { 
-                url: 'http://localhost:5000', description: 'Local server' 
+                url: 'http://my-node-env.eba-7tri2szs.us-east-1.elasticbeanstalk.com', description: 'Local server' 
             }
         ],
         components: {
