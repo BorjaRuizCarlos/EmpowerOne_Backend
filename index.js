@@ -7,7 +7,7 @@ const setupSwagger = require('./swagger.js');
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:8000'], // Add your frontend URLs
+  origin: ['http://localhost:5000'], // Add your frontend URLs
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
